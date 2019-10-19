@@ -5,7 +5,7 @@
 *tf_eager_yolov3.egg-info
 *.coverage
 *.pytest_cache
-
+/tests/dataset/iis/
 
 *.h5
 *.weights
