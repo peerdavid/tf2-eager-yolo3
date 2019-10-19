@@ -6,6 +6,7 @@
 *.coverage
 *.pytest_cache
 /tests/dataset/iis/
+/tests/dataset/
 
 *.h5
 *.weights

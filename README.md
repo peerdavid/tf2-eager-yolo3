@@ -14,7 +14,16 @@ https://www.tensorflow.org/install/gpu for GPU support.
 3. Update your pip installation: ```pip3 install --upgrade pip```
 4. Install all requirements. Use requirements-gpu if a gpu is available, requirements-cpu otherwise: ```pip3 install -r requirements-cpu.txt```
 
+# Create your own dataset
+## SVHN
+1.) Annotations - https://github.com/penny4860/svhn-voc-annotation-format
+2.) Images - http://ufldl.stanford.edu/housenumbers/
 
+
+# Train
+```bash
+python train_eager.py -c configs/iis.json
+```
 
 I have implemented yolo-v3 detector using tf2 eager execution.
 
