@@ -16,11 +16,11 @@ mv svhn-voc-annotation-format/annotation/test/* ../tests/dataset/iis/test/anns
 
 # Create svhn images
 echo "#### Create IIS images ####"
-#curl http://ufldl.stanford.edu/housenumbers/train.tar.gz -o train.tar.gz
+curl http://ufldl.stanford.edu/housenumbers/train.tar.gz -o train.tar.gz
 tar -xzvf train.tar.gz
 mv train ../tests/dataset/iis/train/imgs
 
-#curl http://ufldl.stanford.edu/housenumbers/test.tar.gz -o test.tar.gz
+curl http://ufldl.stanford.edu/housenumbers/test.tar.gz -o test.tar.gz
 tar -xzvf test.tar.gz
 mv test ../tests/dataset/iis/test/imgs
 
