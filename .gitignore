@@ -7,6 +7,7 @@
 *.pytest_cache
 /tests/dataset/iis/
 /tests/dataset/
+/tmp/
 
 *.h5
 *.weights
