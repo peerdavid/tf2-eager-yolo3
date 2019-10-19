@@ -38,11 +38,15 @@ To detect single objects simply call
 python pred.py -c configs/iis.json -i imgs/housenumber.jpg
 ```
 
+Note: If no config file is provided, the default YoloV3 model is downloaded and executed.
+
 
 # Video stream
 ```bash
 python video.py -c configs/iis.json
 ```
+
+Note: If no config file is provided, the default YoloV3 model is downloaded and executed.
 
 
 # References
