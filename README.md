@@ -1,11 +1,11 @@
-# Yolo-v3 with TensorFlow 2.0
+# YoloV3 with TensorFlow 2.0
 Credit: https://github.com/penny4860/tf2-eager-yolo3
 
 
 # Setup
-For this installation we assume that python3 and pip is already installed and 
-(if you want to use a GPU) all necessary nvidia-drivers and CUDNN. See also 
-https://www.tensorflow.org/install/gpu for GPU support.
+For this installation we assume that python3, pip3 and all nvidia drivers
+(if you want GPU support) are already installed. Then execute the following
+to create a virtual environment and install all necessary packages:
 
 1. Create virtual environment: ```python3 -m venv env```
 2. Activate venv: ```source env/bin/activate```
