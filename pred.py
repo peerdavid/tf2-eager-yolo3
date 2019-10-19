@@ -21,7 +21,7 @@ argparser.add_argument(
 argparser.add_argument(
     '-i',
     '--image',
-    default="tests/samples/sample.jpeg",
+    default='tests/samples/svhn.png',
     help='path to image file')
 
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     image = image[:,:,::-1]
     
     # 3. Run detection
-    boxes, labels, probs = detector.detect(image, 0.5)
+    boxes, labels, probs = detector.detect(image, 0.7)
     
     # 4. draw detected boxes
     visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
