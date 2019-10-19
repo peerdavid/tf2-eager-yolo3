@@ -45,7 +45,7 @@ def _loop_train(model, optimizer, generator):
         ys = [yolo_1, yolo_2, yolo_3]
         grads, loss = _grad_fn(model, xs, ys)
         loss_value += loss
-        optimizer.apply_gradients(zip(grads, model.variables))
+        optimizer.apply_gradients(zip(grads, model.trainable_variables))
     loss_value /= generator.steps_per_epoch
     return loss_value
 
@@ -78,7 +78,7 @@ def _grad_fn(model, images_tensor, list_y_trues):
         logits = model(images_tensor)
         loss = loss_fn(list_y_trues, logits)
         # print("loss = ", loss)
-    return tape.gradient(loss, model.variables), loss
+    return tape.gradient(loss, model.trainable_variables), loss
 
 
 if __name__ == '__main__':

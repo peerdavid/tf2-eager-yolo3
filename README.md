@@ -1,6 +1,20 @@
-[![Build Status](https://travis-ci.org/penny4860/tf2-eager-yolo3.svg?branch=master)](https://travis-ci.org/penny4860/tf2-eager-yolo3) [![codecov](https://codecov.io/gh/penny4860/tf2-eager-yolo3/branch/master/graph/badge.svg)](https://codecov.io/gh/penny4860/tf2-eager-yolo3)
-
 # TF2 eager implementation of Yolo-v3
+
+Credit: https://github.com/penny4860/tf2-eager-yolo3
+
+
+
+# Installation
+For this installation we assume that python3 and pip is already installed and 
+(if you want to use a GPU) all necessary nvidia-drivers and CUDNN. See also 
+https://www.tensorflow.org/install/gpu for GPU support.
+
+1. Create virtual environment: ```python3 -m venv env```
+2. Activate venv: ```source env/bin/activate```
+3. Update your pip installation: ```pip3 install --upgrade pip```
+4. Install all requirements. Use requirements-gpu if a gpu is available, requirements-cpu otherwise: ```pip3 install -r requirements-cpu.txt```
+
+
 
 I have implemented yolo-v3 detector using tf2 eager execution.
 
