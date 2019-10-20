@@ -43,14 +43,14 @@ if __name__ == '__main__':
     device = "/CPU:0" if len(gpus) == 0 else "/GPU:0"
     device = "/GPU:1" if TF_GPU_SETUP == "iis" else device
     
-    # 1. create generator
     with tf.device(device):
+      # Create data generator
       train_generator, valid_generator = config_parser.create_generator()
       
-      # 2. create model
+      # Create the YoloV3 model
       model = config_parser.create_model()
 
-      # 3. training
+      # Train the (preloaded) model
       learning_rate, save_dname, n_epoches = config_parser.get_train_params()
       summary_dir = save_dname + "/summary"
       train_fn(model,
@@ -59,5 +59,5 @@ if __name__ == '__main__':
               summary_dir=summary_dir,
               learning_rate=learning_rate,
               save_dname=save_dname,
-              num_epoches=n_epoches)
+              epoch=n_epoches)
 

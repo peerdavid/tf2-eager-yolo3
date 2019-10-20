@@ -8,18 +8,18 @@ from yolo.loss import loss_fn
 
 
 def train_fn(model, train_generator, valid_generator=None, 
-        learning_rate=1e-4, num_epoches=500, save_dname=None, summary_dir=None):
+        learning_rate=1e-4, epoch=500, save_dname=None, summary_dir=None):
     
-    summary_dir = "tmp/summary" if summary_dir is none else summary_dir
-    writer = tf.summary.create_file_writer("summary_dir")
+    summary_dir = "tmp/summary" if summary_dir is None else summary_dir
+    writer = tf.summary.create_file_writer(summary_dir)
     save_fname = _setup(save_dname)
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     
     history = []
-    for i in range(num_epoches):
+    for i in range(epoch):
         with writer.as_default():
             # Train for one epoch
-            train_loss = _loop_train(model, optimizer, train_generator)
+            train_loss = _loop_train(model, optimizer, train_generator, i)
             
             # Validate
             if valid_generator:
@@ -44,7 +44,7 @@ def train_fn(model, train_generator, valid_generator=None,
     return history
 
 
-def _loop_train(model, optimizer, generator):
+def _loop_train(model, optimizer, generator, epoch):
     # one epoch
     
     n_steps = generator.steps_per_epoch
@@ -55,6 +55,8 @@ def _loop_train(model, optimizer, generator):
         grads, loss = _grad_fn(model, xs, ys)
         loss_value += loss
         optimizer.apply_gradients(zip(grads, model.trainable_variables))
+   
+    tf.summary.image("Input", xs, step=epoch)
     loss_value /= generator.steps_per_epoch
     return loss_value
 
