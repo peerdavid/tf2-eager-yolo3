@@ -9,6 +9,7 @@
 /tests/dataset/
 /tmp/
 /.tmp/
+/configs/iis/
 
 *.h5
 *.weights
