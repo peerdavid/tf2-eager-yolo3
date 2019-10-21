@@ -19,11 +19,11 @@ def train_fn(model, train_generator, valid_generator=None,
     for i in range(epoch):
         with writer.as_default():
             # Train for one epoch
-            train_loss = _loop_train(model, optimizer, train_generator, i)
+            train_loss = _loop_train(model, optimizer, train_generator, i, writer)
             
             # Validate
             if valid_generator:
-                valid_loss = _loop_validation(model, valid_generator)
+                valid_loss = _loop_validation(model, valid_generator, writer, i)
                 loss_value = valid_loss
             else:
                 loss_value = train_loss
@@ -36,13 +36,11 @@ def train_fn(model, train_generator, valid_generator=None,
             if save_fname is not None and loss_value == min(history):
                 print("    update weight {}".format(loss_value))
                 model.save_weights("{}.h5".format(save_fname))
-        
-        writer.flush()
     
     return history
 
 
-def _loop_train(model, optimizer, generator, epoch):
+def _loop_train(model, optimizer, generator, epoch, writer):
     # one epoch
     
     n_steps = generator.steps_per_epoch
@@ -55,14 +53,16 @@ def _loop_train(model, optimizer, generator, epoch):
         optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
         if i % 100 == 0:
-            tf.summary.scalar("training_loss", (loss_value / i), step=i)
-   
-    tf.summary.image("Input", xs, step=epoch)
+            step = epoch * n_steps + i
+            tf.summary.scalar("training_loss", loss, step=step)
+            tf.summary.image("training_image", xs, step=step)
+            writer.flush()
+
     loss_value /= generator.steps_per_epoch
     return loss_value
 
 
-def _loop_validation(model, generator):
+def _loop_validation(model, generator, writer, epoch):
     # one epoch
     n_steps = generator.steps_per_epoch
     loss_value = 0
@@ -70,11 +70,14 @@ def _loop_validation(model, generator):
         xs, yolo_1, yolo_2, yolo_3 = generator.next_batch()
         ys = [yolo_1, yolo_2, yolo_3]
         ys_ = model(xs)
-        loss_value += loss_fn(ys, ys_)
-
-        if i % 100 == 0:
-            tf.summary.scalar("validation_loss", (loss_value / i), step=i)
+        loss_value += loss_fn(ys, ys_)        
     loss_value /= generator.steps_per_epoch
+
+    step = (epoch+1) * n_steps
+    tf.summary.scalar("validation_loss", loss_value, step=step)
+    tf.summary.image("validation_image", xs, step=step)
+    writer.flush()
+
     return loss_value
 
 
