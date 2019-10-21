@@ -28,10 +28,8 @@ def train_fn(model, train_generator, valid_generator=None,
             else:
                 loss_value = train_loss
             
-            # Logging onto console and tensorboard
+            # Logging onto console after each epoch
             print("{}-th loss = {}, train_loss = {}".format(i, loss_value, train_loss))
-            tf.summary.scalar("train_loss", train_loss, step=i)
-            tf.summary.scalar("validation_loss", loss_value, step=i)
 
             # Write weights file if it is the best one
             history.append(loss_value)
@@ -49,12 +47,15 @@ def _loop_train(model, optimizer, generator, epoch):
     
     n_steps = generator.steps_per_epoch
     loss_value = 0
-    for _ in tqdm(range(n_steps)):
+    for i in tqdm(range(n_steps)):
         xs, yolo_1, yolo_2, yolo_3 = generator.next_batch()
         ys = [yolo_1, yolo_2, yolo_3]
         grads, loss = _grad_fn(model, xs, ys)
         loss_value += loss
         optimizer.apply_gradients(zip(grads, model.trainable_variables))
+
+        if i % 100 == 0:
+            tf.summary.scalar("training_loss", (loss_value / i), step=i)
    
     tf.summary.image("Input", xs, step=epoch)
     loss_value /= generator.steps_per_epoch
@@ -65,11 +66,14 @@ def _loop_validation(model, generator):
     # one epoch
     n_steps = generator.steps_per_epoch
     loss_value = 0
-    for _ in range(n_steps):
+    for i in range(n_steps):
         xs, yolo_1, yolo_2, yolo_3 = generator.next_batch()
         ys = [yolo_1, yolo_2, yolo_3]
         ys_ = model(xs)
         loss_value += loss_fn(ys, ys_)
+
+        if i % 100 == 0:
+            tf.summary.scalar("validation_loss", (loss_value / i), step=i)
     loss_value /= generator.steps_per_epoch
     return loss_value
 

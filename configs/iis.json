@@ -16,8 +16,8 @@
         "train_annot_folder":   "tests/dataset/iis/train/anns",
         "valid_image_folder":   "tests/dataset/iis/test/imgs",
         "valid_annot_folder":   "tests/dataset/iis/test/anns",
-        "batch_size":           16,
-        "learning_rate":        1e-4,
+        "batch_size":           32,
+        "learning_rate":        1e-5,
         "save_folder":         "configs/iis",
         "jitter":               false
     }
