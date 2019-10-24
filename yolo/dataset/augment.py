@@ -37,7 +37,8 @@ class ImgAugment(object):
             image, boxes_ = make_jitter_on_image(image, boxes_)
     
         # 3. resize image            
-        image, boxes_ = resize_image(image, boxes_, self._w, self._h)
+        image_h, image_w, _ = image.shape
+        image, boxes_ = resize_image(image, boxes_, image_w, image_h)
         return image, boxes_
 
 

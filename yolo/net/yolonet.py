@@ -53,16 +53,13 @@ class Yolonet(tf.keras.Model):
         self.call(sample, training=False)
 
 
-def preprocess_input(image, net_size):
+def preprocess_input(image):
     """
     # Args
         image : array, shape of (H, W, 3)
             RGB-ordered
-        net_size : int
     """
-    # resize the image to the new size
-    preprocess_img = cv2.resize(image/255., (net_size, net_size))
-    return np.expand_dims(preprocess_img, axis=0)
+    return np.expand_dims(image/255., axis=0)
 
 
 if __name__ == '__main__':
