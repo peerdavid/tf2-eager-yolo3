@@ -29,7 +29,7 @@ argparser = argparse.ArgumentParser(
 argparser.add_argument(
     '-c',
     '--config',
-    default="configs/svhn.json",
+    default="configs/iis.json",
     help='config file')
 
 

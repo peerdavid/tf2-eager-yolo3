@@ -86,7 +86,7 @@ class BatchGenerator(object):
         fname, boxes, coded_labels = parse_annotation(self.ann_fnames[self._index], self.img_dir, self.lable_names)
 
         # 2. read image in fixed size
-        img_augmenter = ImgAugment(net_size, net_size, self.jitter)
+        img_augmenter = ImgAugment(self.jitter, net_size)
         img, boxes_ = img_augmenter.imread(fname, boxes)
 
         # 3. Append ys

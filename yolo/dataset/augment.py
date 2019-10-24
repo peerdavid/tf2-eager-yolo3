@@ -6,7 +6,7 @@ import cv2
 
 
 class ImgAugment(object):
-    def __init__(self, w, h, jitter):
+    def __init__(self, jitter, net_size):
         """
         # Args
             desired_w : int
@@ -14,8 +14,7 @@ class ImgAugment(object):
             jitter : bool
         """
         self._jitter = jitter
-        self._w = w
-        self._h = h
+        self._net_size = net_size
         
     def imread(self, img_file, boxes):
         """
@@ -37,7 +36,7 @@ class ImgAugment(object):
             image, boxes_ = make_jitter_on_image(image, boxes_)
     
         # 3. resize image            
-        image, boxes_ = resize_image(image, boxes_, self._w, self._h)
+        image, boxes_ = resize_image(image, boxes_, self._net_size)
         return image, boxes_
 
 
@@ -85,11 +84,21 @@ def make_jitter_on_image(image, boxes):
     return image, np.array(new_boxes)
 
 
-def resize_image(image, boxes, desired_w, desired_h):
+def resize_image(image, boxes, net_size):
     h, w, _ = image.shape
     
     # resize the image to standard size
-    image = cv2.resize(image, (desired_h, desired_w))
+    border_v = 0
+    border_h = 0
+    if w >= h:
+        border_v = int((w - h) / 2)
+    else:
+        border_h = int((h - w) / 2)
+    desired_w = net_size - 2 * border_v
+    desired_h = net_size - 2 * border_h
+
+    image = cv2.copyMakeBorder(image, border_v, border_v, border_h, border_h, cv2.BORDER_CONSTANT, 0)
+    image = cv2.resize(image, (net_size, net_size))
     image = image[:,:,::-1]
 
     # fix object's position and size
