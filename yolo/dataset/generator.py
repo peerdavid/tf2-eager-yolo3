@@ -40,24 +40,24 @@ class BatchGenerator(object):
         
         self.steps_per_epoch = int(len(ann_fnames) / batch_size)
 
-        self._epoch = 0
-        self._end_epoch = False
+        self._epoch = -1
+        self._new_epoch = True
         self._index = 0
-        self._initial_net_size()
 
-    def _initial_net_size(self):
-        self._net_size = DOWNSAMPLE_RATIO * ((self.min_net_size/DOWNSAMPLE_RATIO + self.max_net_size/DOWNSAMPLE_RATIO) // 2)
-        self._net_size = int(self._net_size)
-        print("_initial_net_size")
-        print(self.min_net_size, self.max_net_size, self._net_size)
 
     def _update_net_size(self):
         self._net_size = DOWNSAMPLE_RATIO*np.random.randint(self.min_net_size/DOWNSAMPLE_RATIO, \
                                                             self.max_net_size/DOWNSAMPLE_RATIO+1)
+        print("NetSize: (%d, %d, %d)" % (self.min_net_size, self.max_net_size, self._net_size) )
+
 
     def next_batch(self):
-        if self._epoch >= 5:
+        if self._new_epoch == True:
             self._update_net_size()
+            if self.shuffle:
+                shuffle(self.ann_fnames)
+            self._new_epoch = False
+            self._epoch += 1
 
         xs = []
         ys_1 = []
@@ -69,13 +69,7 @@ class BatchGenerator(object):
             ys_1.append(y1)
             ys_2.append(y2)
             ys_3.append(y3)
-        
-        if self._end_epoch == True:
-            if self.shuffle:
-                shuffle(self.ann_fnames)
-            self._end_epoch = False
-            self._epoch += 1
-        
+                
         return np.array(xs).astype(np.float32), np.array(ys_1).astype(np.float32), np.array(ys_2).astype(np.float32), np.array(ys_3).astype(np.float32)
 
     def _get(self):
@@ -98,9 +92,9 @@ class BatchGenerator(object):
             _assign_box(list_ys[scale_index], box_index, _coded_box, label)
 
         self._index += 1
-        if self._index == len(self.ann_fnames):
+        if self._index >= len(self.ann_fnames):
             self._index = 0
-            self._end_epoch = True
+            self._new_epoch = True
         
         return normalize(img), list_ys[2], list_ys[1], list_ys[0]
 

@@ -37,8 +37,8 @@ if __name__ == '__main__':
     args = argparser.parse_args()
     config_parser = ConfigParser(args.config)
 
-    # Select device and log placement
-    tf.debugging.set_log_device_placement(True)
+    # Select device
+    #tf.debugging.set_log_device_placement(True)
     gpus = tf.config.experimental.list_physical_devices('GPU')
     device = "/CPU:0" if len(gpus) == 0 else "/GPU:0"
     device = "/GPU:1" if TF_GPU_SETUP == "iis" else device
