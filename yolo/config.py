@@ -22,6 +22,7 @@
         "batch_size":           16,
         "learning_rate":        1e-4,
         "save_folder":         "configs/svhn",
+        "keep_image_ratio":     true,
         "jitter":               false
     }
 }
@@ -77,6 +78,7 @@ class ConfigParser(object):
                                          min_net_size=self._train_config["min_size"],
                                          max_net_size=self._train_config["max_size"],
                                          jitter=self._train_config["jitter"],
+                                         keep_image_ratio=self._train_config["keep_image_ratio"],
                                          shuffle=True)
         if len(valid_ann_fnames) > 0:
             valid_generator = BatchGenerator(valid_ann_fnames,
@@ -87,6 +89,7 @@ class ConfigParser(object):
                                                min_net_size=self._model_config["net_size"],
                                                max_net_size=self._model_config["net_size"],
                                                jitter=False,
+                                               keep_image_ratio=self._train_config["keep_image_ratio"],
                                                shuffle=False)
         else:
             valid_generator = None

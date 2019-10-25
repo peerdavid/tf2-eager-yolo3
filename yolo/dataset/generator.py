@@ -26,7 +26,8 @@ class BatchGenerator(object):
                  min_net_size=320,
                  max_net_size=608,    
                  jitter=True,
-                 shuffle=True):
+                 shuffle=True,
+                 keep_image_ratio=False):
 
         self.ann_fnames = ann_fnames
         self.img_dir = img_dir
@@ -37,6 +38,7 @@ class BatchGenerator(object):
         self.anchors            = create_anchor_boxes(anchors)
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.keep_image_ratio = keep_image_ratio
         
         self.steps_per_epoch = int(len(ann_fnames) / batch_size)
 
@@ -82,7 +84,7 @@ class BatchGenerator(object):
         fname, boxes, coded_labels = parse_annotation(self.ann_fnames[self._index], self.img_dir, self.lable_names)
 
         # 2. read image in fixed size
-        img_augmenter = ImgAugment(self.jitter, net_size)
+        img_augmenter = ImgAugment(self.jitter, net_size, self.keep_image_ratio)
         img, boxes_ = img_augmenter.imread(fname, boxes)
 
         # 3. Append ys

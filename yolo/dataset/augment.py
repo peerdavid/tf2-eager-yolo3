@@ -6,7 +6,7 @@ import cv2
 
 
 class ImgAugment(object):
-    def __init__(self, jitter, net_size):
+    def __init__(self, jitter, net_size, keep_image_ratio):
         """
         # Args
             desired_w : int
@@ -15,7 +15,9 @@ class ImgAugment(object):
         """
         self._jitter = jitter
         self._net_size = net_size
+        self._keep_image_ratio = keep_image_ratio
         
+
     def imread(self, img_file, boxes):
         """
         # Args
@@ -36,7 +38,7 @@ class ImgAugment(object):
             image, boxes_ = make_jitter_on_image(image, boxes_)
     
         # 3. resize image            
-        image, boxes_ = resize_image(image, boxes_, self._net_size)
+        image, boxes_ = resize_image(image, boxes_, self._net_size, keep_ratio=self._keep_image_ratio)
         return image, boxes_
 
 
@@ -84,7 +86,7 @@ def make_jitter_on_image(image, boxes):
     return image, np.array(new_boxes)
 
 
-def resize_image(image, boxes, net_size, keep_ratio=True):
+def resize_image(image, boxes, net_size, keep_ratio=False):
     h, w, _ = image.shape
     new_boxes = []
     real_width = net_size
@@ -204,7 +206,7 @@ if __name__ == '__main__':
     desired_h = 416
     jitter = True
     
-    aug = ImgAugment(desired_w, desired_h, jitter)
+    aug = ImgAugment(desired_w, desired_h, jitter, False)
     img, boxes_ = aug.imread(img_file, boxes)
     img = img.astype(np.uint8)
     
