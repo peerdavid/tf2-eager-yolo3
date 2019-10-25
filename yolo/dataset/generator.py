@@ -63,14 +63,16 @@ class BatchGenerator(object):
         ys_1 = []
         ys_2 = []
         ys_3 = []
+        bs = []
         for _ in range(self.batch_size):
-            x, y1, y2, y3 = self._get()
+            x, y1, y2, y3, b = self._get()
             xs.append(x)
             ys_1.append(y1)
             ys_2.append(y2)
             ys_3.append(y3)
+            bs.append(b)
                 
-        return np.array(xs).astype(np.float32), np.array(ys_1).astype(np.float32), np.array(ys_2).astype(np.float32), np.array(ys_3).astype(np.float32)
+        return np.array(xs).astype(np.float32), np.array(ys_1).astype(np.float32), np.array(ys_2).astype(np.float32), np.array(ys_3).astype(np.float32), bs
 
     def _get(self):
         
@@ -96,7 +98,7 @@ class BatchGenerator(object):
             self._index = 0
             self._new_epoch = True
         
-        return normalize(img), list_ys[2], list_ys[1], list_ys[0]
+        return normalize(img), list_ys[2], list_ys[1], list_ys[0], boxes_
 
 
 def _create_empty_xy(net_size, n_classes, n_boxes=3):

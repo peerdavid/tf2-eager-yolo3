@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 from yolo.loss import loss_fn
 from yolo.utils.box import visualize_boxes
+from yolo.utils.visualization_utils import draw_bounding_box_on_image_array
 
 def train_fn(config_parser, model, train_generator, valid_generator=None, 
         learning_rate=1e-4, epoch=500, save_dname=None, summary_dir=None):
@@ -46,7 +47,7 @@ def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
     n_steps = generator.steps_per_epoch
     loss_value = 0
     for i in tqdm(range(n_steps)):
-        xs, yolo_1, yolo_2, yolo_3 = generator.next_batch()
+        xs, yolo_1, yolo_2, yolo_3, true_boxes = generator.next_batch() # true_boxes = [[x1, y1, x2, y2], [x1, ...], ...]
         ys = [yolo_1, yolo_2, yolo_3]
         grads, loss = _grad_fn(model, xs, ys)
         loss_value += loss
@@ -55,8 +56,19 @@ def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
         if i % 100 == 0:
             step = epoch * n_steps + i
             tf.summary.scalar("training_loss", loss, step=step)
-            tf.summary.image("training_image", [xs[0]], step=step)
 
+            # Training image with groutnd truth boxes
+            training_image = xs[0] * 255
+            for training_boxes in true_boxes[0]:
+                x1 = training_boxes[0]
+                y1 = training_boxes[1]
+                x2 = training_boxes[2]
+                y2 = training_boxes[3]
+                draw_bounding_box_on_image_array(training_image, y1, x1, y2, x2,
+                    use_normalized_coordinates=False)
+            tf.summary.image("training_image", [training_image / 255.], step=step)
+
+            # Training images with predictions of network
             image = xs[0] * 255
             detector = config_parser.create_detector(model)
             boxes, labels, probs = detector.detect(image, 0.8)           
@@ -74,7 +86,7 @@ def _loop_validation(config_parser, model, generator, epoch, writer):
     n_steps = generator.steps_per_epoch
     loss_value = 0
     for i in range(n_steps):
-        xs, yolo_1, yolo_2, yolo_3 = generator.next_batch()
+        xs, yolo_1, yolo_2, yolo_3, true_boxes = generator.next_batch()
         ys = [yolo_1, yolo_2, yolo_3]
         ys_ = model(xs)
         loss_value += loss_fn(ys, ys_)        

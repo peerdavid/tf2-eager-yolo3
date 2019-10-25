@@ -86,40 +86,46 @@ def make_jitter_on_image(image, boxes):
 
 def resize_image(image, boxes, net_size, keep_ratio=True):
     h, w, _ = image.shape
-    
+    new_boxes = []
+    real_width = net_size
+    real_height = net_size
+
     # resize the image to standard size
+    border_v = 0
+    border_h = 0
+    scale_x = float(net_size) / w
+    scale_y = float(net_size) / h
     if keep_ratio:
-        border_v = 0
-        border_h = 0
         if w >= h:
             border_v = int((w - h) / 2)
+            scale_x = float(net_size) / w
+            scale_y = scale_x
         else:
             border_h = int((h - w) / 2)
+            scale_x = float(net_size) / h
+            scale_y = scale_x
+            
         image = cv2.copyMakeBorder(image, border_v, border_v, border_h, border_h, cv2.BORDER_CONSTANT, 0)
-        desired_w = net_size - 2 * border_v
-        desired_h = net_size - 2 * border_h
-    else:
-        desired_w=net_size
-        desired_h=net_size
+
+    # fix object's position and size
+    for box in boxes:
+        x1,y1,x2,y2 = box
+        x1 = int(x1 * scale_x)
+        x1 = max(min(x1, net_size), 0) + border_h * scale_x
+        x2 = int(x2 * scale_x)
+        x2 = max(min(x2, net_size), 0) + border_h * scale_x
+        
+        y1 = int(y1 * scale_y)
+        y1 = max(min(y1, net_size), 0) + border_v * scale_y
+        y2 = int(y2 * scale_y)
+        y2 = max(min(y2, net_size), 0) + border_v * scale_y
+        new_boxes.append([x1,y1,x2,y2])
+
 
     image = cv2.resize(image, (net_size, net_size))
     image = image[:,:,::-1]
 
-    # fix object's position and size
-    new_boxes = []
-    for box in boxes:
-        x1,y1,x2,y2 = box
-        x1 = int(x1 * float(desired_w) / w)
-        x1 = max(min(x1, desired_w), 0)
-        x2 = int(x2 * float(desired_w) / w)
-        x2 = max(min(x2, desired_w), 0)
-        
-        y1 = int(y1 * float(desired_h) / h)
-        y1 = max(min(y1, desired_h), 0)
-        y2 = int(y2 * float(desired_h) / h)
-        y2 = max(min(y2, desired_h), 0)
 
-        new_boxes.append([x1,y1,x2,y2])
     return image, np.array(new_boxes)
 
 
