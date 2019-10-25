@@ -84,7 +84,7 @@ def make_jitter_on_image(image, boxes):
     return image, np.array(new_boxes)
 
 
-def resize_image(image, boxes, net_size, keep_ratio=False):
+def resize_image(image, boxes, net_size, keep_ratio=True):
     h, w, _ = image.shape
     
     # resize the image to standard size

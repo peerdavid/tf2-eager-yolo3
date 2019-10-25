@@ -55,14 +55,13 @@ def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
         if i % 100 == 0:
             step = epoch * n_steps + i
             tf.summary.scalar("training_loss", loss, step=step)
-            tf.summary.image("training_in_image", [xs[0]], step=step)
+            tf.summary.image("training_image", [xs[0]], step=step)
 
-            image = xs[0]
-            #image = image[:,:,::-1]
+            image = xs[0] * 255
             detector = config_parser.create_detector(model)
             boxes, labels, probs = detector.detect(image, 0.8)           
             visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
-            tf.summary.image("training_out_image", [image], step=step)
+            tf.summary.image("training_prediction", [image / 255.], step=step)
 
             writer.flush()
 
@@ -85,12 +84,11 @@ def _loop_validation(config_parser, model, generator, epoch, writer):
     tf.summary.scalar("validation_loss", loss_value, step=step)
     tf.summary.image("validation_in_image", xs, step=step)
 
-    image = xs[0]
-    #image = image[:,:,::-1]
+    image = xs[0] * 255
     detector = config_parser.create_detector(model)
     boxes, labels, probs = detector.detect(image, 0.8)           
     visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
-    tf.summary.image("validation_out_image", [image], step=step)
+    tf.summary.image("validation_prediction", [image / 255.], step=step)
 
     writer.flush()
 
