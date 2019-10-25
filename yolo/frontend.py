@@ -31,7 +31,7 @@ class YoloDetector(object):
         
         # 3. predict
         yolos = self._model.predict(new_image)
-        boxes_ = postprocess_ouput(yolos, self._anchors, self._net_size, image_h, image_w)
+        boxes_ = postprocess_ouput(yolos, self._anchors, self._net_size, image_h, image_w, obj_thresh=cls_threshold)
         
         if len(boxes_) > 0:
             boxes, probs = boxes_to_array(boxes_)

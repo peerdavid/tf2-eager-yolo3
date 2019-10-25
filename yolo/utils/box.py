@@ -78,8 +78,12 @@ def nms_boxes(boxes, nms_threshold=0.3, obj_threshold=0.3):
         boxes : list of BoundBox
             non maximum supressed BoundBox instances
     """
+    # remove the boxes which are less likely than a obj_threshold
+    boxes = [box for box in boxes if box.get_score() > obj_threshold]
+
     if len(boxes) == 0:
         return boxes
+
     # suppress non-maximal boxes
     n_classes = len(boxes[0].classes)
     for c in range(n_classes):
@@ -96,7 +100,7 @@ def nms_boxes(boxes, nms_threshold=0.3, obj_threshold=0.3):
 
                     if boxes[index_i].iou(boxes[index_j]) >= nms_threshold:
                         boxes[index_j].classes[c] = 0
-    # remove the boxes which are less likely than a obj_threshold
+    
     boxes = [box for box in boxes if box.get_score() > obj_threshold]
     return boxes
 
@@ -245,13 +249,14 @@ def find_match_box(centroid_box, centroid_boxes):
 
 
 from yolo.utils.visualization_utils import visualize_boxes_and_labels_on_image_array
-def visualize_boxes(image, boxes, labels, probs, class_labels):
+def visualize_boxes(image, boxes, labels, probs, class_labels, max_boxes_to_draw=20):
     category_index = {}
     for id_, label_name in enumerate(class_labels):
         category_index[id_] = {"name": label_name}
     
     boxes = np.array([np.array([b[1],b[0],b[3],b[2]]) for b in boxes])
-    visualize_boxes_and_labels_on_image_array(image, boxes, labels, probs, category_index)
+    visualize_boxes_and_labels_on_image_array(image, boxes, labels, probs, category_index, 
+        max_boxes_to_draw=max_boxes_to_draw)
 
 
 if __name__ == '__main__':

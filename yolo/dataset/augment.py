@@ -84,20 +84,24 @@ def make_jitter_on_image(image, boxes):
     return image, np.array(new_boxes)
 
 
-def resize_image(image, boxes, net_size):
+def resize_image(image, boxes, net_size, keep_ratio=False):
     h, w, _ = image.shape
     
     # resize the image to standard size
-    border_v = 0
-    border_h = 0
-    if w >= h:
-        border_v = int((w - h) / 2)
+    if keep_ratio:
+        border_v = 0
+        border_h = 0
+        if w >= h:
+            border_v = int((w - h) / 2)
+        else:
+            border_h = int((h - w) / 2)
+        image = cv2.copyMakeBorder(image, border_v, border_v, border_h, border_h, cv2.BORDER_CONSTANT, 0)
+        desired_w = net_size - 2 * border_v
+        desired_h = net_size - 2 * border_h
     else:
-        border_h = int((h - w) / 2)
-    desired_w = net_size - 2 * border_v
-    desired_h = net_size - 2 * border_h
+        desired_w=net_size
+        desired_h=net_size
 
-    image = cv2.copyMakeBorder(image, border_v, border_v, border_h, border_h, cv2.BORDER_CONSTANT, 0)
     image = cv2.resize(image, (net_size, net_size))
     image = image[:,:,::-1]
 

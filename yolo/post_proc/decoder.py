@@ -29,7 +29,7 @@ def postprocess_ouput(yolos, anchors, net_size, image_h, image_w, obj_thresh=0.5
     correct_yolo_boxes(boxes, image_h, image_w)
 
     # 3. suppress non-maximal boxes
-    nms_boxes(boxes, nms_thresh)
+    nms_boxes(boxes, nms_threshold=nms_thresh, obj_threshold=obj_thresh)
     return boxes
 
 

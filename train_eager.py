@@ -53,7 +53,8 @@ if __name__ == '__main__':
       # Train the (preloaded) model
       learning_rate, save_dname, n_epoches = config_parser.get_train_params()
       summary_dir = save_dname + "/summary"
-      train_fn(model,
+      train_fn(config_parser,
+              model,
               train_generator,
               valid_generator,
               summary_dir=summary_dir,

@@ -5,9 +5,9 @@ import os
 from tqdm import tqdm
 
 from yolo.loss import loss_fn
+from yolo.utils.box import visualize_boxes
 
-
-def train_fn(model, train_generator, valid_generator=None, 
+def train_fn(config_parser, model, train_generator, valid_generator=None, 
         learning_rate=1e-4, epoch=500, save_dname=None, summary_dir=None):
     
     summary_dir = "tmp/summary" if summary_dir is None else summary_dir
@@ -19,11 +19,11 @@ def train_fn(model, train_generator, valid_generator=None,
     for i in range(epoch):
         with writer.as_default():
             # Train for one epoch
-            train_loss = _loop_train(model, optimizer, train_generator, i, writer)
+            train_loss = _loop_train(config_parser, model, optimizer, train_generator, i, writer)
             
             # Validate
             if valid_generator:
-                valid_loss = _loop_validation(model, valid_generator, writer, i)
+                valid_loss = _loop_validation(config_parser, model, valid_generator, i, writer)
                 loss_value = valid_loss
             else:
                 loss_value = train_loss
@@ -40,7 +40,7 @@ def train_fn(model, train_generator, valid_generator=None,
     return history
 
 
-def _loop_train(model, optimizer, generator, epoch, writer):
+def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
     # one epoch
     
     n_steps = generator.steps_per_epoch
@@ -55,14 +55,22 @@ def _loop_train(model, optimizer, generator, epoch, writer):
         if i % 100 == 0:
             step = epoch * n_steps + i
             tf.summary.scalar("training_loss", loss, step=step)
-            tf.summary.image("training_image", xs, step=step)
+            tf.summary.image("training_in_image", [xs[0]], step=step)
+
+            image = xs[0]
+            #image = image[:,:,::-1]
+            detector = config_parser.create_detector(model)
+            boxes, labels, probs = detector.detect(image, 0.8)           
+            visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
+            tf.summary.image("training_out_image", [image], step=step)
+
             writer.flush()
 
     loss_value /= generator.steps_per_epoch
     return loss_value
 
 
-def _loop_validation(model, generator, writer, epoch):
+def _loop_validation(config_parser, model, generator, epoch, writer):
     # one epoch
     n_steps = generator.steps_per_epoch
     loss_value = 0
@@ -75,7 +83,15 @@ def _loop_validation(model, generator, writer, epoch):
 
     step = (epoch+1) * n_steps
     tf.summary.scalar("validation_loss", loss_value, step=step)
-    tf.summary.image("validation_image", xs, step=step)
+    tf.summary.image("validation_in_image", xs, step=step)
+
+    image = xs[0]
+    #image = image[:,:,::-1]
+    detector = config_parser.create_detector(model)
+    boxes, labels, probs = detector.detect(image, 0.8)           
+    visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
+    tf.summary.image("validation_out_image", [image], step=step)
+
     writer.flush()
 
     return loss_value
