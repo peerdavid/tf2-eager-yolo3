@@ -39,6 +39,7 @@ class ImgAugment(object):
     
         # 3. resize image            
         image, boxes_ = resize_image(image, boxes_, self._net_size, keep_ratio=self._keep_image_ratio)
+        image = image[:,:,::-1]
         return image, boxes_
 
 
@@ -110,24 +111,22 @@ def resize_image(image, boxes, net_size, keep_ratio=False):
         image = cv2.copyMakeBorder(image, border_v, border_v, border_h, border_h, cv2.BORDER_CONSTANT, 0)
 
     # fix object's position and size
-    for box in boxes:
-        x1,y1,x2,y2 = box
-        x1 = int(x1 * scale_x)
-        x1 = max(min(x1, net_size), 0) + border_h * scale_x
-        x2 = int(x2 * scale_x)
-        x2 = max(min(x2, net_size), 0) + border_h * scale_x
-        
-        y1 = int(y1 * scale_y)
-        y1 = max(min(y1, net_size), 0) + border_v * scale_y
-        y2 = int(y2 * scale_y)
-        y2 = max(min(y2, net_size), 0) + border_v * scale_y
-        new_boxes.append([x1,y1,x2,y2])
+    if boxes != None:
+        for box in boxes:
+            x1,y1,x2,y2 = box
+            x1 = int(x1 * scale_x)
+            x1 = max(min(x1, net_size), 0) + border_h * scale_x
+            x2 = int(x2 * scale_x)
+            x2 = max(min(x2, net_size), 0) + border_h * scale_x
+            
+            y1 = int(y1 * scale_y)
+            y1 = max(min(y1, net_size), 0) + border_v * scale_y
+            y2 = int(y2 * scale_y)
+            y2 = max(min(y2, net_size), 0) + border_v * scale_y
+            new_boxes.append([x1,y1,x2,y2])
 
 
     image = cv2.resize(image, (net_size, net_size))
-    image = image[:,:,::-1]
-
-
     return image, np.array(new_boxes)
 
 

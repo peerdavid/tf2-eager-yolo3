@@ -50,6 +50,10 @@ class ConfigParser(object):
         model = Yolonet(n_classes=len(self._model_config["labels"]))
         
         keras_weights = self._pretrained_config["keras_format"]
+        if (keras_weights != "" and keras_weights != None) and not os.path.exists(keras_weights):
+            print("(ERROR) Could not load weights file %s" % keras_weights)
+            exit()
+
         if os.path.exists(keras_weights):
             model.load_weights(keras_weights)
             print("Keras pretrained weights loaded from {}!!".format(keras_weights))
@@ -123,6 +127,9 @@ class ConfigParser(object):
 
     def get_labels(self):
         return self._model_config["labels"]
+
+    def get_net_size(self):
+        return self._model_config["net_size"]
     
     def _get_train_anns(self):
         ann_fnames = glob.glob(os.path.join(self._train_config["train_annot_folder"], "*.xml"))

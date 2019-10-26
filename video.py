@@ -5,7 +5,7 @@ import cv2
 
 from yolo.utils.box import visualize_boxes
 from yolo.config import ConfigParser
-
+from yolo.dataset.augment import resize_image
 
 
 argparser = argparse.ArgumentParser(
@@ -48,6 +48,7 @@ def main(args):
         # Capture every nth frame only because we are too slow 
         # to capture every frame...
         ret, image = cap.read()
+        #image, _ = resize_image(image, None, config_parser.get_net_size(), keep_ratio=True)
         if not ret:
             print("(Error) Lost connection to video stream")
             break
