@@ -57,7 +57,7 @@ def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
             step = epoch * n_steps + i
             tf.summary.scalar("training_loss", loss, step=step)
 
-            # Training image with groutnd truth boxes
+            # Training image with ground truth boxes
             training_image = xs[0] * 255
             for training_boxes in true_boxes[0]:
                 x1 = training_boxes[0]
@@ -71,7 +71,7 @@ def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
             # Training images with predictions of network
             image = xs[0] * 255
             detector = config_parser.create_detector(model)
-            boxes, labels, probs = detector.detect(image, 0.8)           
+            boxes, labels, probs = dtraining_boxesetector.detect(image, 0.8)           
             visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
             tf.summary.image("training_prediction", [image / 255.], step=step)
 
@@ -92,10 +92,22 @@ def _loop_validation(config_parser, model, generator, epoch, writer):
         loss_value += loss_fn(ys, ys_)        
     loss_value /= generator.steps_per_epoch
 
+    # Log validation loss
     step = (epoch+1) * n_steps
     tf.summary.scalar("validation_loss", loss_value, step=step)
-    tf.summary.image("validation_in_image", xs, step=step)
-
+    
+    # Log input validation image with bounding boxes
+    validation_image = xs[0] * 255
+    for validation_boxes in true_boxes[0]:
+        x1 = validation_boxes[0]
+        y1 = validation_boxes[1]
+        x2 = validation_boxes[2]
+        y2 = validation_boxes[3]
+        draw_bounding_box_on_image_array(validation_image, y1, x1, y2, x2,
+            use_normalized_coordinates=False)
+    tf.summary.image("validation_image", [validation_image / 255.], step=step)
+    
+    # Log prediction with bounding boxes
     image = xs[0] * 255
     detector = config_parser.create_detector(model)
     boxes, labels, probs = detector.detect(image, 0.8)           
