@@ -45,6 +45,7 @@ class BatchGenerator(object):
         self._epoch = -1
         self._new_epoch = True
         self._index = 0
+        self._net_size = self.min_net_size
 
 
     def _update_net_size(self):

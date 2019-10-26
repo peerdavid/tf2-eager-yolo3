@@ -13,7 +13,6 @@ def train_fn(config_parser, model, train_generator, valid_generator=None,
     
     summary_dir = "tmp/summary" if summary_dir is None else summary_dir
     writer = tf.summary.create_file_writer(summary_dir)
-    save_fname = _setup(save_dname)
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     
     history = []
@@ -22,21 +21,21 @@ def train_fn(config_parser, model, train_generator, valid_generator=None,
             # Train for one epoch
             train_loss = _loop_train(config_parser, model, optimizer, train_generator, i, writer)
             
-            # Validate
+            # Validate after each trainings-epoch
             if valid_generator:
                 valid_loss = _loop_validation(config_parser, model, valid_generator, i, writer)
                 loss_value = valid_loss
             else:
                 loss_value = train_loss
-            
+
             # Logging onto console after each epoch
             print("{}-th loss = {}, train_loss = {}".format(i, loss_value, train_loss))
 
-            # Write weights file if it is the best one
+            # Write weights file
             history.append(loss_value)
-            if save_fname is not None and loss_value == min(history):
-                print("    update weight {}".format(loss_value))
-                model.save_weights("{}.h5".format(save_fname))
+            save_fname = _setup(save_dname, i)
+            print("    update weight {}".format(loss_value))
+            model.save_weights("{}.h5".format(save_fname))
     
     return history
 
@@ -71,7 +70,7 @@ def _loop_train(config_parser, model, optimizer, generator, epoch, writer):
             # Training images with predictions of network
             image = xs[0] * 255
             detector = config_parser.create_detector(model)
-            boxes, labels, probs = dtraining_boxesetector.detect(image, 0.8)           
+            boxes, labels, probs = detector.detect(image, 0.8)           
             visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
             tf.summary.image("training_prediction", [image / 255.], step=step)
 
@@ -88,12 +87,12 @@ def _loop_validation(config_parser, model, generator, epoch, writer):
     for i in range(n_steps):
         xs, yolo_1, yolo_2, yolo_3, true_boxes = generator.next_batch()
         ys = [yolo_1, yolo_2, yolo_3]
-        ys_ = model(xs)
-        loss_value += loss_fn(ys, ys_)        
+        logits = model(xs)
+        loss_value += loss_fn(ys, logits)        
     loss_value /= generator.steps_per_epoch
 
     # Log validation loss
-    step = (epoch+1) * n_steps
+    step = (epoch + 1) * n_steps
     tf.summary.scalar("validation_loss", loss_value, step=step)
     
     # Log input validation image with bounding boxes
@@ -119,11 +118,11 @@ def _loop_validation(config_parser, model, generator, epoch, writer):
     return loss_value
 
 
-def _setup(save_dname):
+def _setup(save_dname, epoch):
     if save_dname:
         if not os.path.exists(save_dname):
             os.makedirs(save_dname)
-        save_fname = os.path.join(save_dname, "weights")
+        save_fname = os.path.join(save_dname, "weights_%d" % epoch)
     else:
         save_fname = None
     return save_fname
