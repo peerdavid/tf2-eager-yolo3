@@ -56,7 +56,8 @@ def main(args):
         # Detect objects and measure timing
         if detect <= 0:
             t1 = time.time()
-            boxes, labels, probs = detector.detect(image, 0.7)
+            min_prob = 0.90
+            boxes, labels, probs = detector.detect(image, min_prob)
             t2 = time.time()
             times.append(t2-t1)
             times = times[-20:]
