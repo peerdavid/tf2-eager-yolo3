@@ -111,7 +111,7 @@ def resize_image(image, boxes, net_size, keep_ratio=False):
         image = cv2.copyMakeBorder(image, border_v, border_v, border_h, border_h, cv2.BORDER_CONSTANT, 0)
 
     # fix object's position and size
-    if boxes != None:
+    if not (boxes is None):
         for box in boxes:
             x1,y1,x2,y2 = box
             x1 = int(x1 * scale_x)
