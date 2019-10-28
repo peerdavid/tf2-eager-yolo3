@@ -38,9 +38,10 @@ if __name__ == '__main__':
     # Load image
     image = cv2.imread(image_path)
     image, _ = resize_image(image, None, config_parser.get_net_size(), keep_ratio=True)
+    image = image[:,:,::-1]
    
     # Predict
-    boxes, labels, probs = detector.detect(image, 0.7)
+    boxes, labels, probs = detector.detect(image, 0.9)
     visualize_boxes(image, boxes, labels, probs, config_parser.get_labels())
     plt.imshow(image)
     plt.show()
