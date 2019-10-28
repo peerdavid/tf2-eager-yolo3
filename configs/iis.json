@@ -5,7 +5,7 @@
         "net_size":               608
     },
     "pretrained" : {
-        "keras_format":             "configs/iis/weights_19.h5",
+        "keras_format":             "configs/iis/weights_38.h5",
         "darknet_format":           "yolov3.weights"
     },
     "train" : {
