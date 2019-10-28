@@ -23,7 +23,7 @@
         "learning_rate":        1e-4,
         "save_folder":         "configs/svhn",
         "keep_image_ratio":     true,
-        "jitter":               false
+        "data_augmentation":    false
     }
 }
 """
@@ -81,7 +81,7 @@ class ConfigParser(object):
                                          anchors=self._model_config["anchors"],
                                          min_net_size=self._train_config["min_size"],
                                          max_net_size=self._train_config["max_size"],
-                                         jitter=self._train_config["jitter"],
+                                         data_augmentation=self._train_config["data_augmentation"],
                                          keep_image_ratio=self._train_config["keep_image_ratio"],
                                          shuffle=True)
         if len(valid_ann_fnames) > 0:
@@ -92,7 +92,7 @@ class ConfigParser(object):
                                                anchors=self._model_config["anchors"],
                                                min_net_size=self._model_config["net_size"],
                                                max_net_size=self._model_config["net_size"],
-                                               jitter=False,
+                                               data_augmentation=False,
                                                keep_image_ratio=self._train_config["keep_image_ratio"],
                                                shuffle=False)
         else:

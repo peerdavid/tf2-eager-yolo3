@@ -25,23 +25,21 @@ class BatchGenerator(object):
                  anchors=COCO_ANCHORS,   
                  min_net_size=320,
                  max_net_size=608,    
-                 jitter=True,
+                 data_augmentation=True,
                  shuffle=True,
                  keep_image_ratio=False):
 
         self.ann_fnames = ann_fnames
         self.img_dir = img_dir
         self.lable_names = labels
-        self.min_net_size       = (min_net_size//DOWNSAMPLE_RATIO)*DOWNSAMPLE_RATIO
-        self.max_net_size       = (max_net_size//DOWNSAMPLE_RATIO)*DOWNSAMPLE_RATIO
-        self.jitter             = jitter
-        self.anchors            = create_anchor_boxes(anchors)
+        self.min_net_size = (min_net_size//DOWNSAMPLE_RATIO)*DOWNSAMPLE_RATIO
+        self.max_net_size = (max_net_size//DOWNSAMPLE_RATIO)*DOWNSAMPLE_RATIO
+        self.data_augmentation  = data_augmentation
+        self.anchors = create_anchor_boxes(anchors)
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.keep_image_ratio = keep_image_ratio
-        
         self.steps_per_epoch = int(len(ann_fnames) / batch_size)
-
         self._epoch = -1
         self._new_epoch = True
         self._index = 0
@@ -85,7 +83,7 @@ class BatchGenerator(object):
         fname, boxes, coded_labels = parse_annotation(self.ann_fnames[self._index], self.img_dir, self.lable_names)
 
         # 2. read image in fixed size
-        img_augmenter = ImgAugment(self.jitter, net_size, self.keep_image_ratio)
+        img_augmenter = ImgAugment(self.data_augmentation, net_size, self.keep_image_ratio)
         img, boxes_ = img_augmenter.imread(fname, boxes)
 
         # 3. Append ys
@@ -197,6 +195,6 @@ if __name__ == '__main__':
     img_dir = os.path.join(PROJECT_ROOT, "tests", "dataset", "raccoon", "imgs")
     ann_fnames = glob.glob(os.path.join(ann_dir, "*.xml"))
 
-    iterator = create_generator(ann_fnames, img_dir, 2, jitter=False)
+    iterator = create_generator(ann_fnames, img_dir, 2, data_augmentation=False)
     test(*iterator.get_next())
 

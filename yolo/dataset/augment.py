@@ -6,14 +6,14 @@ import cv2
 
 
 class ImgAugment(object):
-    def __init__(self, jitter, net_size, keep_image_ratio):
+    def __init__(self, data_augmentation, net_size, keep_image_ratio):
         """
         # Args
             desired_w : int
             desired_h : int
-            jitter : bool
+            data_augmentation : bool
         """
-        self._jitter = jitter
+        self._data_augmentation = data_augmentation
         self._net_size = net_size
         self._keep_image_ratio = keep_image_ratio
         
@@ -27,15 +27,15 @@ class ImgAugment(object):
         # Returns
             image : 3d-array, shape of (h, w, 3)
             boxes_ : array, same shape of boxes
-                jittered & resized bounding box
+                data_augmented & resized bounding box
         """
         # 1. read image file
         image = cv2.imread(img_file)
     
-        # 2. make jitter on image
+        # 2. augment images
         boxes_ = np.copy(boxes)
-        if self._jitter:
-            image, boxes_ = make_jitter_on_image(image, boxes_)
+        if self._data_augmentation:
+            image, boxes_ = augment_image(image, boxes_)
     
         # 3. resize image            
         image, boxes_ = resize_image(image, boxes_, self._net_size, keep_ratio=self._keep_image_ratio)
@@ -43,7 +43,7 @@ class ImgAugment(object):
         return image, boxes_
 
 
-def make_jitter_on_image(image, boxes):
+def augment_image(image, boxes):
     h, w, _ = image.shape
 
     ### scale the image
@@ -203,9 +203,9 @@ if __name__ == '__main__':
     
     desired_w = 416
     desired_h = 416
-    jitter = True
+    augment_image = True
     
-    aug = ImgAugment(desired_w, desired_h, jitter, False)
+    aug = ImgAugment(desired_w, desired_h, augment_image, False)
     img, boxes_ = aug.imread(img_file, boxes)
     img = img.astype(np.uint8)
     
